@@ -14,7 +14,7 @@ function clear_errors() {
 function chat_message(username, message) {
 	var now = new Date();
 	$('.chat-box > tbody:last').append('<tr>' +
-			'<td>' + now + '</td>' +
+			'<td>' + now.getHours() + ':' + now.getMinutes() + ':' + now.getSeconds() + '</td>' +
 			'<td>' + username + '</td>' +
 			'<td>' + message + '</td>' +
 		'</tr>');
@@ -27,6 +27,7 @@ $(document).ready(function() {
 	// init
 	
 	$('#guess-container').hide();
+	$('#users-container').hide();
 	$('#fatal-error').hide();
 	
 	// debug
@@ -62,13 +63,17 @@ $(document).ready(function() {
 	});
 	
 	server.bind('join', function(event) {
-		if (event.accepted) {
-			clear_errors();
-			$('#join-container').hide();
-			$('#guess-container').show();
-		} else {
+		if (!event.accepted) {
 			error("Could not join: [" + event.message + "]");
+			return;	
 		}
+		
+		clear_errors();
+		$('#join-container').hide();
+		$('#guess-container').show();
+		$('#users-container').show();
+		
+		server.trigger('users');
 	});
 	
 	// guess
@@ -83,5 +88,17 @@ $(document).ready(function() {
 	
 	server.bind('guess', function(event) {
 		chat_message(event.username, event.word);
+	});
+	
+	// users
+	
+	server.bind('users', function(event) {
+		var items = event.users;
+		items.sort();
+		
+		$('#users').empty();
+		$.each(items, function(key, username) {
+			$('#users').append('<li>' + username + '</li>');
+		});
 	});
 });

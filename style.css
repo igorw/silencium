@@ -16,3 +16,19 @@
 #fatal-error {
 	color: red;
 }
+
+.chat-box {
+	width: 550px;
+}
+
+.chat-box tr td:nth-child(1), .chat-box tr td:nth-child(2) {
+	width: 100px;
+}
+
+.chat-box tr td {
+	padding: 5px;
+}
+
+.chat-box tr:nth-child(even) {
+	background: lightblue;
+}

@@ -8,6 +8,7 @@ class Card
 end
 
 class User
+  attr_accessor :ws
   attr_accessor :name
   attr_accessor :cards
   
@@ -65,7 +66,6 @@ class SilenciumServer
         # client disconnect
         ws.onclose {
           @ws_channel.unsubscribe sid
-          
           client_disconnect ws, sid
         }
         
@@ -81,13 +81,16 @@ class SilenciumServer
   end
   
   def client_connect(ws, sid)
-    trigger_event ws, Event.new(:connect)
-    
     log "Client connected: #{sid}"
+    
+    trigger_event ws, Event.new(:connect)
   end
   
   def client_disconnect(ws, sid)
     log "Client disconnected: #{sid}"
+    
+    remove_user ws
+    trigger_event_users
   end
   
   def trigger_event(ws, event)
@@ -103,24 +106,63 @@ class SilenciumServer
   def receive_event(ws, event)
     log "Received event: #{event.to_s}"
     
+    if event.name != :join && find_user(ws).nil?
+      log "Event from non-joined user (ws: #{ws})"
+    end
+    
     case event.name
       when :join then
+        error = false
         if event.data[:username].empty?
-          trigger_event ws, Event.new(:join, {accepted: false, message: "No username given"})
+          error = "No username given"
+        elsif find_user_name(event.data[:username])
+          error = "Username already taken"
+        end
+        
+        if error
+          trigger_event ws, Event.new(:join, {accepted: false, message: error})
         else
           @users << User.new(ws, event.data[:username])
           trigger_event ws, Event.new(:join, accepted: true)
+          trigger_event_users
           trigger_event ws, Event.new(:debug, message: "joined game")
         end
       when :guess then
-        trigger_global_event Event.new(:guess, {username: event.data[:username], word: event.data[:word]})
+        trigger_global_event Event.new(:guess, {username: find_user(ws).name, word: event.data[:word]})
     end
+  end
+  
+  def trigger_event_users
+    trigger_global_event Event.new(:users, users: @users.map { |user| user.name })
   end
   
   private
   
   def log(message)
     puts [Time.new, message]
+  end
+  
+  def find_user(ws)
+    @users.each do |user|
+      if ws === user.ws
+        return user
+      end
+    end
+  end
+  
+  def find_user_name(name)
+    @users.each do |user|
+      if name === user.name
+        return user
+      end
+    end
+    
+    nil
+  end
+  
+  def remove_user(ws)
+    user = find_user(ws)
+    @users.delete user
   end
 end
 
