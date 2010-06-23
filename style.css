@@ -34,13 +34,21 @@
 }
 
 .chat-box tr.system {
+	background: lightgrey;
+}
+
+.chat-box tr.correct-guess {
 	background: lightgreen;
 }
 
-#users li.giver:after {
-	content: " (giver)";
+#users li.giver {
+	color: red;
 }
 
 #users li.myself {
-	color: red;
+	font-weight: bold;
+}
+
+#scoreboard li.myself {
+	font-weight: bold;
 }

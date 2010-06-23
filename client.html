@@ -57,6 +57,9 @@
         <input type="text" id="give-hint" />
         <input type="submit" value="Hint">
       </form>
+      
+      <p><strong>Word:</strong> <span id="give-word"></span></p>
+      <p><strong>Taboo:</strong> <span id="give-taboo"></span></p>
     </div>
     
     <div class="container player giver">
@@ -79,6 +82,14 @@
   <div id="fatal-error" class="exception">
     <h2>Fatal error</h2>
     <p>The server appears to be down.</p>
+  </div>
+  
+  <div id="game-over" class="exception">
+    <h2>Game over</h2>
+    <p>The game is over.</p>
+    
+    <ul id="scoreboard">
+    </ul>
   </div>
 </body>
 </html>

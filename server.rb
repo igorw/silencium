@@ -13,13 +13,17 @@ require './model/user.rb'
 class SilenciumServer
   def initialize
     @ws_channel = EM::Channel.new
+    
     @cards = [
       Card.new('car', ['wheels', 'mercedes']),
       Card.new('github', ['git', 'hub']),
       Card.new('hell', ['god', 'satan', 'demon']),
+      Card.new('beer', ['duff', 'drink']),
+      Card.new('phpbb', ['forum', 'bulletin', 'board']),
     ]
     @old_cards = []
     @users = []
+    @card = nil
     
     @time_remaining = 60
     @paused = true
@@ -91,8 +95,14 @@ class SilenciumServer
   def receive_event(ws, event)
     log "Received event: #{event.to_s}"
     
-    if event.name != :join && find_user(ws).nil?
-      log "Event from non-joined user (ws: #{ws})"
+    user = find_user(ws)
+    
+    if event.name != :join && user.nil?
+      log "Rejected #{event.name.to_s} event from non-joined user (ws: #{ws})"
+      return
+    elsif event.name == :guess && is_giver?(user)
+      log "Giver trying to guess"
+      return
     end
     
     case event.name
@@ -113,9 +123,20 @@ class SilenciumServer
           user_count_changed :join
         end
       when :guess then
-        trigger_global_event Event.new(:guess, {username: find_user(ws).name, word: event.data[:word]})
+        correct = false
+        
+        # correct guess
+        if event.data[:word] == @card.word
+          user.score += 1
+          find_giver.score += 1
+          correct = true
+          
+          next_card
+        end
+        
+        trigger_global_event Event.new(:guess, {username: user.name, word: event.data[:word], correct: correct})
       when :give then
-        trigger_global_event Event.new(:give, {username: find_user(ws).name, hint: event.data[:hint]})
+        trigger_global_event Event.new(:give, {username: user.name, hint: event.data[:hint]})
     end
   end
   
@@ -124,7 +145,16 @@ class SilenciumServer
   def user_count_changed(status = :join)
     # set up giver
     if @users.size > 0
-      @users.first.trigger_event Event.new(:become_giver)
+      @card = @cards.first
+      
+      if @card.nil?
+        game_over
+        return
+      end
+      
+      giver = find_giver
+      giver.trigger_event Event.new(:become_giver)
+      giver.trigger_event Event.new(:new_card, {word: @card.word, taboo_words: @card.taboo_words})
     end
     
     # check if more than one user is playing
@@ -169,21 +199,51 @@ class SilenciumServer
     @users.delete user
   end
   
+  def find_giver
+    @users.first
+  end
+  
   def is_giver?(user)
-    user === @users.first
+    user === find_giver
   end
   
   def next_round
+    log "Next round"
+    
     # first user becomes last
     @users << @users.shift
     
-    @users.first.trigger_event Event.new(:become_giver)
+    find_giver.trigger_event Event.new(:become_giver)
     @users.last.trigger_event Event.new(:become_player)
     
     @time_remaining = 60
     @paused = false
     
+    next_card
+  end
+  
+  def next_card
+    log "Next card"
+    
+    @old_cards << @cards.shift
+    @card = @cards.first
+    
+    if @card.nil?
+      game_over
+      return
+    end
+    
+    find_giver.trigger_event Event.new(:new_card, {word: @card.word, taboo_words: @card.taboo_words})
     trigger_users
+  end
+  
+  def game_over
+    log "Game over"
+    
+    @paused = true
+    
+    scoreboard = @users.sort {|a, b| a.score <=> b.score }.map { |user| {name: user.name, score: user.score} }.reverse
+    trigger_global_event Event.new(:game_over, users: scoreboard)
   end
   
   def trigger_time_sync
@@ -191,7 +251,7 @@ class SilenciumServer
   end
   
   def trigger_users
-    trigger_global_event Event.new(:users, users: @users.map {|user| {name: user.name, giver: is_giver?(user)} })
+    trigger_global_event Event.new(:users, users: @users.map { |user| {name: user.name, giver: is_giver?(user), score: user.score} })
   end
 end
 

@@ -102,7 +102,8 @@ $(document).ready(function() {
 	});
 	
 	server.bind('guess', function(event) {
-		chat_message(event.username, event.word);
+		class = event.correct ? 'correct-guess' : '';
+		chat_message(event.username, event.word, class);
 	});
 	
 	// give
@@ -124,7 +125,7 @@ $(document).ready(function() {
 	server.bind('users', function(event) {
 		$('#users').empty();
 		$.each(event.users, function(key, user) {
-			var li = $('<li>').text(user.name);
+			var li = $('<li>').text(user.name + ' (' + user.score + ')');
 			if (user.giver) {
 				li.addClass('giver');
 			}
@@ -133,6 +134,13 @@ $(document).ready(function() {
 			}
 			$('#users').append(li);
 		});
+	});
+	
+	// new card
+	
+	server.bind('new_card', function(event) {
+		$('#give-word').text(event.word);
+		$('#give-taboo').text(event.taboo_words.join(', '));
 	});
 	
 	// pause
@@ -171,6 +179,22 @@ $(document).ready(function() {
 		
 		$('.container').hide();
 		$('.player').show();
+	});
+	
+	// game over
+	
+	server.bind('game_over', function(event) {
+		$('#game-container').hide();
+		$('.exception').hide();
+		$('#game-over').show();
+		
+		$.each(event.users, function(key, user) {
+			var li = $('<li>').text(user.name + ' (' + user.score + ')');
+			if (user.name == username) {
+				li.addClass('myself');
+			}
+			$('#scoreboard').append(li);
+		});
 	});
 	
 	// time sync

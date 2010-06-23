@@ -1,12 +1,12 @@
 class User
   attr_accessor :ws
   attr_accessor :name
-  attr_accessor :points
+  attr_accessor :score
   
   def initialize(ws, name)
     @ws = ws
     @name = name
-    @points = 0
+    @score = 0
   end
   
   def trigger_event(event)
