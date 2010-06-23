@@ -6,57 +6,9 @@ require 'eventmachine'
 require 'em-websocket'
 require 'json'
 
-class Card
-  attr_accessor :word
-  attr_accessor :taboo_words
-  
-  def initialize(word, taboo_words)
-    @word = word
-    @taboo_words = taboo_words
-  end
-end
-
-class User
-  attr_accessor :ws
-  attr_accessor :name
-  attr_accessor :points
-  
-  def initialize(ws, name)
-    @ws = ws
-    @name = name
-    @points = 0
-  end
-  
-  def trigger_event(event)
-    @ws.send Event.export(event)
-  end
-end
-
-class Event
-  attr_reader :name
-  attr_reader :data
-  
-  def initialize(name, data = nil)
-    @name = name.to_sym
-    @data = !data.nil? ? data : {}
-    
-    # symbolize
-    @data = @data.inject({}) { |memo, (k, v)| memo[k.to_sym] = v; memo }
-  end
-  
-  def to_s
-    "#{@name.to_s} #{@data.to_s}"
-  end
-  
-  def self.import(raw_event)
-    parsed_event = JSON.parse(raw_event);
-    Event.new(parsed_event[0], parsed_event[1])
-  end
-  
-  def self.export(event)
-    [event.name.to_s, event.data].to_json
-  end
-end
+require './model/card.rb'
+require './model/event.rb'
+require './model/user.rb'
 
 class SilenciumServer
   def initialize
