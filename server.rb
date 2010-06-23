@@ -20,6 +20,22 @@ class SilenciumServer
     ]
     @old_cards = []
     @users = []
+    
+    @time_remaining = 60
+    @paused = true
+    
+    EM::PeriodicTimer.new(1) do
+      if !@paused
+        if @time_remaining == 0
+          @paused = true
+          next_round
+        end
+        
+        @time_remaining -= 1
+        
+        trigger_time_sync
+      end
+    end
   end
   
   def init_ws(options)
@@ -106,9 +122,6 @@ class SilenciumServer
   # called whenever a user joins or leaves
   # status is :join or :leave
   def user_count_changed(status = :join)
-    # trigger user event
-    trigger_global_event Event.new(:users, users: @users.map {|user| {name: user.name, giver: is_giver?(user)} })
-    
     # set up giver
     if @users.size > 0
       @users.first.trigger_event Event.new(:become_giver)
@@ -117,11 +130,16 @@ class SilenciumServer
     # check if more than one user is playing
     if @users.size == 1
       # only one guy left
+      @paused = true
       trigger_global_event Event.new(:pause)
     elsif @users.size == 2 && status == :join
       # second user joined, game can continue
+      @paused = false
       trigger_global_event Event.new(:unpause)
     end
+    
+    trigger_users
+    trigger_time_sync
   end
   
   def log(message)
@@ -161,6 +179,19 @@ class SilenciumServer
     
     @users.first.trigger_event Event.new(:become_giver)
     @users.last.trigger_event Event.new(:become_player)
+    
+    @time_remaining = 60
+    @paused = false
+    
+    trigger_users
+  end
+  
+  def trigger_time_sync
+    trigger_global_event Event.new(:time_sync, time_remaining: @time_remaining)
+  end
+  
+  def trigger_users
+    trigger_global_event Event.new(:users, users: @users.map {|user| {name: user.name, giver: is_giver?(user)} })
   end
 end
 

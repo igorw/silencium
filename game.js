@@ -35,6 +35,7 @@ $(document).ready(function() {
 	var server = new ServerEventDispatcher(ws);
 	
 	var giver = false;
+	var time_remaining = 0;
 	
 	// init
 	
@@ -84,8 +85,6 @@ $(document).ready(function() {
 		clear_errors();
 		$('.container').hide();
 		$('.player').show();
-		
-		server.trigger('users');
 	});
 	
 	// guess
@@ -162,5 +161,12 @@ $(document).ready(function() {
 		
 		$('.container').hide();
 		$('.player').show();
+	});
+	
+	// time sync
+	
+	server.bind('time_sync', function(event) {
+		time_remaining = event.time_remaining;
+		$('#time_remaining').text(time_remaining);
 	});
 });
