@@ -136,7 +136,15 @@ class SilenciumServer
         
         trigger_global_event Event.new(:guess, {username: user.name, word: event.data[:word], correct: correct})
       when :give then
-        trigger_global_event Event.new(:give, {username: user.name, hint: event.data[:hint]})
+        hint = event.data[:hint]
+        
+        regex = Regexp.new(Regexp.escape(@card.word) + '|' + @card.taboo_words.map { |word| Regexp.escape(word) }.join('|'))
+        
+        if regex.match(hint)
+          find_giver.trigger_event Event.new(:system_message, message: "#{hint} is taboo, you fool")
+        else
+          trigger_global_event Event.new(:give, {username: user.name, hint: hint})
+        end
     end
   end
   

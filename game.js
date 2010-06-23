@@ -120,6 +120,10 @@ $(document).ready(function() {
 		chat_message(event.username, event.hint, 'giver');
 	});
 	
+	server.bind('system_message', function(event) {
+		chat_message('', event.message, 'system');
+	});
+	
 	// users
 	
 	server.bind('users', function(event) {
