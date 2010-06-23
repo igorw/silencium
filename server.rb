@@ -105,10 +105,10 @@ class SilenciumServer
         end
         
         if error
-          trigger_event ws, Event.new(:join, {accepted: false, message: error})
+          trigger_event ws, Event.new(:join, {accepted: false, username: event.data[:username], message: error})
         else
           @users << User.new(ws, event.data[:username])
-          trigger_event ws, Event.new(:join, accepted: true)
+          trigger_event ws, Event.new(:join, {accepted: true, username: event.data[:username]})
           trigger_event ws, Event.new(:debug, message: "joined game")
           user_count_changed :join
         end

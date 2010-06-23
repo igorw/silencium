@@ -34,6 +34,7 @@ $(document).ready(function() {
 	var ws = new WebSocket("ws://localhost:3001");
 	var server = new ServerEventDispatcher(ws);
 	
+	var username = '';
 	var giver = false;
 	var time_remaining = 0;
 	
@@ -85,6 +86,9 @@ $(document).ready(function() {
 		clear_errors();
 		$('.container').hide();
 		$('.player').show();
+		
+		username = event.username;
+		debug('username: ' + event.username);
 	});
 	
 	// guess
@@ -120,8 +124,14 @@ $(document).ready(function() {
 	server.bind('users', function(event) {
 		$('#users').empty();
 		$.each(event.users, function(key, user) {
-			var class = user.giver ? 'giver' : '';
-			$('#users').append($('<li>').text(user.name).addClass(class));
+			var li = $('<li>').text(user.name);
+			if (user.giver) {
+				li.addClass('giver');
+			}
+			if (user.name == username) {
+				li.addClass('myself');
+			}
+			$('#users').append(li);
 		});
 	});
 	

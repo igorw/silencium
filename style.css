@@ -40,3 +40,7 @@
 #users li.giver:after {
 	content: " (giver)";
 }
+
+#users li.myself {
+	color: red;
+}
