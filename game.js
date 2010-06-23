@@ -18,6 +18,7 @@ $(document).ready(function() {
 	// init
 	
 	$('#guess-container').hide();
+	$('#fatal-error').hide();
 	
 	// debug
 	
@@ -37,6 +38,8 @@ $(document).ready(function() {
 	// close (ws)
 	
 	server.bind('close', function(event) {
+		$('#game-container').hide();
+		$('#fatal-error').show();
 		debug("Error: Websocket closed");
 	});
 	

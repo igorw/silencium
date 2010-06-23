@@ -12,3 +12,7 @@
 #error-container {
 	color: red;
 }
+
+#fatal-error {
+	color: red;
+}
