@@ -11,18 +11,30 @@ function clear_errors() {
 	$('#error').empty();
 }
 
-function chat_message(username, message) {
+function chat_message(username, message, class) {
+	if (!class) {
+		var class = '';
+	}
+	
 	var now = new Date();
-	$('.chat-box > tbody:last').append($('<tr>').
-		append($('<td>').text(now.getHours() + ':' + now.getMinutes() + ':' + now.getSeconds())).
-		append($('<td>').text(username)).
-		append($('<td>').text(message))
+	$('.chat-box > tbody:last').append(
+		$('<tr>').
+			append($('<td>').text(now.getHours() + ':' + now.getMinutes() + ':' + now.getSeconds())).
+			append($('<td>').text(username)).
+			append($('<td>').text(message)
+		).addClass(class)
 	);
+	
+	if ($('.chat-box tr').size() > 8) {
+		$('.chat-box tr').first().remove();
+	}
 }
 
 $(document).ready(function() {
-	ws = new WebSocket("ws://localhost:3001");
-	server = new ServerEventDispatcher(ws);
+	var ws = new WebSocket("ws://localhost:3001");
+	var server = new ServerEventDispatcher(ws);
+	
+	var giver = false;
 	
 	// init
 	
@@ -90,15 +102,27 @@ $(document).ready(function() {
 		chat_message(event.username, event.word);
 	});
 	
+	// give
+	
+	$('#give-form').submit(function() {
+		server.trigger('give', {
+			hint: $('#give-hint').val()
+		});
+		$('#give-hint').val('');
+		return false;
+	});
+	
+	server.bind('give', function(event) {
+		chat_message(event.username, event.hint, 'giver');
+	});
+	
 	// users
 	
 	server.bind('users', function(event) {
-		var items = event.users;
-		items.sort();
-		
 		$('#users').empty();
-		$.each(items, function(key, username) {
-			$('#users').append($('<li>').text(username));
+		$.each(event.users, function(key, user) {
+			var class = user.giver ? 'giver' : '';
+			$('#users').append($('<li>').text(user.name).addClass(class));
 		});
 	});
 	
@@ -114,5 +138,29 @@ $(document).ready(function() {
 	server.bind('unpause', function(event) {
 		$('.exception').hide();
 		$('#game-container').show();
+	});
+	
+	// become giver
+	
+	server.bind('become_giver', function(event) {
+		// if we are are already giver
+		// do nothing
+		if (giver) {
+			return;
+		}
+		
+		giver = true;
+		
+		$('.container').hide();
+		$('.giver').show();
+	});
+	
+	// become player
+	
+	server.bind('become_player', function(event) {
+		giver = false;
+		
+		$('.container').hide();
+		$('.player').show();
 	});
 });

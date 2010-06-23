@@ -29,6 +29,14 @@
 	padding: 5px;
 }
 
-.chat-box tr:nth-child(even) {
+.chat-box tr.giver {
 	background: lightblue;
+}
+
+.chat-box tr.system {
+	background: lightgreen;
+}
+
+#users li.giver:after {
+	content: " (giver)";
 }

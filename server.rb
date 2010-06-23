@@ -113,7 +113,9 @@ class SilenciumServer
   end
   
   def trigger_global_event(event)
-    @ws_channel.push event
+    @users.each do |user|
+      user.trigger_event event
+    end
     
     log "Trigger global event: " + event.to_s
   end
@@ -144,6 +146,8 @@ class SilenciumServer
         end
       when :guess then
         trigger_global_event Event.new(:guess, {username: find_user(ws).name, word: event.data[:word]})
+      when :give then
+        trigger_global_event Event.new(:give, {username: find_user(ws).name, hint: event.data[:hint]})
     end
   end
   
@@ -151,7 +155,12 @@ class SilenciumServer
   # status is :join or :leave
   def user_count_changed(status = :join)
     # trigger user event
-    trigger_global_event Event.new(:users, users: @users.map { |user| user.name })
+    trigger_global_event Event.new(:users, users: @users.map {|user| {name: user.name, giver: is_giver?(user)} })
+    
+    # set up giver
+    if @users.size > 0
+      @users.first.trigger_event Event.new(:become_giver)
+    end
     
     # check if more than one user is playing
     if @users.size == 1
@@ -192,6 +201,14 @@ class SilenciumServer
   
   def is_giver?(user)
     user === @users.first
+  end
+  
+  def next_round
+    # first user becomes last
+    @users << @users.shift
+    
+    @users.first.trigger_event Event.new(:become_giver)
+    @users.last.trigger_event Event.new(:become_player)
   end
 end
 
