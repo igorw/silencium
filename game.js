@@ -49,6 +49,7 @@ $(document).ready(function() {
 	
 	server.bind('close', function(event) {
 		$('#game-container').hide();
+		$('.exception').hide();
 		$('#fatal-error').show();
 		debug("Error: Websocket closed");
 	});

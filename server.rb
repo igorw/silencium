@@ -163,10 +163,8 @@ class SilenciumServer
     end
   end
   
-  private
-  
   def log(message)
-    puts [Time.new, message]
+    puts "[#{Time.new.strftime("%H:%M:%S")}] #{message}"
   end
   
   def find_user(ws)
@@ -199,5 +197,5 @@ end
 
 EM.run {
   @server = SilenciumServer.new
-  @server.init_ws :host => "0.0.0.0", :port => 3001
+  @server.init_ws host: "0.0.0.0", port: 3001
 }
