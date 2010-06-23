@@ -1,10 +1,10 @@
 function debug(message) {
-	$('#debug').append('<p>' + message + '</p>');
+	$('#debug').append($('<p>').text(message));
 	$('#debug-container').scrollTop($('#debug-container').scrollTop() + 300);
 }
 
 function error(message) {
-	$('#error').html('<p>' + message + '</p>');
+	$('#error').html($('<p>').text(message));
 }
 
 function clear_errors() {
@@ -13,11 +13,11 @@ function clear_errors() {
 
 function chat_message(username, message) {
 	var now = new Date();
-	$('.chat-box > tbody:last').append('<tr>' +
-			'<td>' + now.getHours() + ':' + now.getMinutes() + ':' + now.getSeconds() + '</td>' +
-			'<td>' + username + '</td>' +
-			'<td>' + message + '</td>' +
-		'</tr>');
+	$('.chat-box > tbody:last').append($('<tr>').
+		append($('<td>').text(now.getHours() + ':' + now.getMinutes() + ':' + now.getSeconds())).
+		append($('<td>').text(username)).
+		append($('<td>').text(message))
+	);
 }
 
 $(document).ready(function() {
@@ -97,7 +97,7 @@ $(document).ready(function() {
 		
 		$('#users').empty();
 		$.each(items, function(key, username) {
-			$('#users').append('<li>' + username + '</li>');
+			$('#users').append($('<li>').text(username));
 		});
 	});
 	
