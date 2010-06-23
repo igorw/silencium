@@ -3,6 +3,14 @@ function debug(message) {
 	$('#debug-container').scrollTop($('#debug-container').scrollTop() + 300);
 }
 
+function error(message) {
+	$('#error').html('<p>' + message + '</p>');
+}
+
+function clear_errors() {
+	$('#error').empty();
+}
+
 $(document).ready(function() {
 	ws = new WebSocket("ws://localhost:3001");
 	server = new ServerEventDispatcher(ws);
@@ -42,7 +50,12 @@ $(document).ready(function() {
 	});
 	
 	server.bind('join', function(event) {
-		$('#join-container').hide();
-		$('#guess-container').show();
+		if (event.accepted) {
+			clear_errors();
+			$('#join-container').hide();
+			$('#guess-container').show();
+		} else {
+			error("Could not join: [" + event.message + "]");
+		}
 	});
 });

@@ -11,8 +11,9 @@ class User
   attr_accessor :name
   attr_accessor :cards
   
-  def initialize(ws)
+  def initialize(ws, name)
     @ws = ws
+    @name = name
   end
   
   def trigger_event(event)
@@ -21,22 +22,20 @@ class User
 end
 
 class Event
-  attr_accessor :name
-  attr_accessor :data
+  attr_reader :name
+  attr_reader :data
   
-  def initialize(name = nil, data = nil)
-      @name = name
-      @data = !data.nil? ? data : {}
+  def initialize(name, data = nil)
+    @name = name.to_sym
+    @data = !data.nil? ? data : {}
+    
+    # symbolize
+    @data = @data.inject({}) { |memo, (k, v)| memo[k.to_sym] = v; memo }
   end
   
   def self.import(raw_event)
     parsed_event = JSON.parse(raw_event);
-    
-    event = Event.new
-    event.name = parsed_event[0].to_sym
-    event.data = parsed_event[1]
-    
-    event
+    Event.new(parsed_event[0], parsed_event[1])
   end
   
   def self.export(event)
@@ -80,11 +79,11 @@ class SilenciumServer
   def client_connect(ws, sid)
     trigger_event ws, Event.new(:connect)
     
-    puts [Time.new, "Client connected: #{sid}"]
+    log "Client connected: #{sid}"
   end
   
   def client_disconnect(ws, sid)
-    puts [Time.new, "Client disconnected: #{sid}"]
+    log "Client disconnected: #{sid}"
   end
   
   def trigger_event(ws, event)
@@ -94,39 +93,28 @@ class SilenciumServer
   def trigger_global_event(event)
     @ws_channel.push event
     
-    puts [Time.new, "Trigger global event: " + event.to_s]
+    log "Trigger global event: " + event.to_s
   end
   
   def receive_event(ws, event)
-    puts [Time.new, "Received event: #{event.name}"]
+    log "Received event: #{event.name}"
     
     case event.name
       when :join then
-        @users << User.new(ws)
-        trigger_event ws, Event.new(:join)
-        trigger_event ws, Event.new(:debug, message: "something")
-        trigger_event ws, Event.new(:debug, message: "something else")
-        trigger_event ws, Event.new(:debug, message: "something else")
-        trigger_event ws, Event.new(:debug, message: "something else")
-        trigger_event ws, Event.new(:debug, message: "something else")
-        trigger_event ws, Event.new(:debug, message: "something else")
-        trigger_event ws, Event.new(:debug, message: "something else")
-        trigger_event ws, Event.new(:debug, message: "something else")
-        trigger_event ws, Event.new(:debug, message: "something else")
-        trigger_event ws, Event.new(:debug, message: "something else")
-        trigger_event ws, Event.new(:debug, message: "something else")
-        trigger_event ws, Event.new(:debug, message: "something else")
-        trigger_event ws, Event.new(:debug, message: "something else")
-        trigger_event ws, Event.new(:debug, message: "something else")
-        trigger_event ws, Event.new(:debug, message: "something else")
-        trigger_event ws, Event.new(:debug, message: "something else")
-        trigger_event ws, Event.new(:debug, message: "something else")
-        trigger_event ws, Event.new(:debug, message: "something else")
-        trigger_event ws, Event.new(:debug, message: "something else")
-        trigger_event ws, Event.new(:debug, message: "something else")
-        trigger_event ws, Event.new(:debug, message: "something else")
-        trigger_event ws, Event.new(:debug, message: "something else")
+        if event.data[:username].empty?
+          trigger_event ws, Event.new(:join, {accepted: false, message: "No username given"})
+        else
+          @users << User.new(ws, event.data[:username])
+          trigger_event ws, Event.new(:join, {accepted: true})
+          trigger_event ws, Event.new(:debug, message: "joined game")
+        end
     end
+  end
+  
+  private
+  
+  def log(message)
+    puts [Time.new, message]
   end
 end
 
