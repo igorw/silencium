@@ -1,5 +1,9 @@
+require 'bundler'
+
+Bundler.setup
+
 require 'eventmachine'
-require './em-websocket/lib/em-websocket'
+require 'em-websocket'
 require 'json'
 
 class Card
