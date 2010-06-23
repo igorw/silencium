@@ -33,6 +33,10 @@ class Event
     @data = @data.inject({}) { |memo, (k, v)| memo[k.to_sym] = v; memo }
   end
   
+  def to_s
+    "#{@name.to_s} #{@data.to_s}"
+  end
+  
   def self.import(raw_event)
     parsed_event = JSON.parse(raw_event);
     Event.new(parsed_event[0], parsed_event[1])
@@ -97,7 +101,7 @@ class SilenciumServer
   end
   
   def receive_event(ws, event)
-    log "Received event: #{event.name}"
+    log "Received event: #{event.to_s}"
     
     case event.name
       when :join then
@@ -105,9 +109,11 @@ class SilenciumServer
           trigger_event ws, Event.new(:join, {accepted: false, message: "No username given"})
         else
           @users << User.new(ws, event.data[:username])
-          trigger_event ws, Event.new(:join, {accepted: true})
+          trigger_event ws, Event.new(:join, accepted: true)
           trigger_event ws, Event.new(:debug, message: "joined game")
         end
+      when :guess then
+        trigger_global_event Event.new(:guess, {username: event.data[:username], word: event.data[:word]})
     end
   end
   

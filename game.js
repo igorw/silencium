@@ -11,6 +11,15 @@ function clear_errors() {
 	$('#error').empty();
 }
 
+function chat_message(username, message) {
+	var now = new Date();
+	$('.chat-box > tbody:last').append('<tr>' +
+			'<td>' + now + '</td>' +
+			'<td>' + username + '</td>' +
+			'<td>' + message + '</td>' +
+		'</tr>');
+}
+
 $(document).ready(function() {
 	ws = new WebSocket("ws://localhost:3001");
 	server = new ServerEventDispatcher(ws);
@@ -60,5 +69,19 @@ $(document).ready(function() {
 		} else {
 			error("Could not join: [" + event.message + "]");
 		}
+	});
+	
+	// guess
+	
+	$('#guess-container form').submit(function() {
+		server.trigger('guess', {
+			word: $('#guess-word').val()
+		});
+		$('#guess-word').val('');
+		return false;
+	});
+	
+	server.bind('guess', function(event) {
+		chat_message(event.username, event.word);
 	});
 });
