@@ -174,6 +174,8 @@ $(document).ready(function() {
 		
 		$('.container').hide();
 		$('.giver').show();
+		
+		$('#give-word').text('');
 	});
 	
 	// become player
@@ -183,6 +185,8 @@ $(document).ready(function() {
 		
 		$('.container').hide();
 		$('.player').show();
+		
+		$('#guess-word').text('');
 	});
 	
 	// game over
