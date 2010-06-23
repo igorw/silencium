@@ -23,29 +23,31 @@
       </div>
     </div>
 
-    <div id="join-container">
+    <div class="container guest">
       <h2>Join</h2>
-      <form>
+      <form id="join-form">
         <input type="text" id="join-username" />
         <input type="submit" value="Join">
       </form>
     </div>
-
-    <div id="guess-container">
-      <h2>Guess the word</h2>
-      
+    
+    <div class="container spectator player giver">
       <table class="chat-box">
         <tbody>
         </tbody>
       </table>
+    </div>
+
+    <div class="container player">
+      <h2>Guess the word</h2>
       
-      <form>
+      <form id="guess-form">
         <input type="text" id="guess-word" />
         <input type="submit" value="Guess">
       </form>
     </div>
     
-    <div id="users-container">
+    <div class="container spectator player giver">
       <h2>Users</h2>
       <ul id="users">
       </ul>

@@ -26,9 +26,9 @@ $(document).ready(function() {
 	
 	// init
 	
-	$('#guess-container').hide();
-	$('#users-container').hide();
+	$('.container').hide();
 	$('#fatal-error').hide();
+	$('.guest').show();
 	
 	// debug
 	
@@ -55,7 +55,7 @@ $(document).ready(function() {
 	
 	// join
 	
-	$('#join-container form').submit(function() {
+	$('#join-form').submit(function() {
 		server.trigger('join', {
 			username: $('#join-username').val()
 		});
@@ -69,16 +69,15 @@ $(document).ready(function() {
 		}
 		
 		clear_errors();
-		$('#join-container').hide();
-		$('#guess-container').show();
-		$('#users-container').show();
+		$('.container').hide();
+		$('.player').show();
 		
 		server.trigger('users');
 	});
 	
 	// guess
 	
-	$('#guess-container form').submit(function() {
+	$('#guess-form').submit(function() {
 		server.trigger('guess', {
 			word: $('#guess-word').val()
 		});
