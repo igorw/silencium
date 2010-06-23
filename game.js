@@ -27,7 +27,7 @@ $(document).ready(function() {
 	// init
 	
 	$('.container').hide();
-	$('#fatal-error').hide();
+	$('.exception').hide();
 	$('.guest').show();
 	
 	// debug
@@ -99,5 +99,19 @@ $(document).ready(function() {
 		$.each(items, function(key, username) {
 			$('#users').append('<li>' + username + '</li>');
 		});
+	});
+	
+	// pause
+	
+	server.bind('pause', function(event) {
+		$('#game-container').hide();
+		$('#pause').show();
+	});
+	
+	// unpause
+	
+	server.bind('unpause', function(event) {
+		$('.exception').hide();
+		$('#game-container').show();
 	});
 });

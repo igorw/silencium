@@ -5,16 +5,22 @@ require 'json'
 class Card
   attr_accessor :word
   attr_accessor :taboo_words
+  
+  def initialize(word, taboo_words)
+    @word = word
+    @taboo_words = taboo_words
+  end
 end
 
 class User
   attr_accessor :ws
   attr_accessor :name
-  attr_accessor :cards
+  attr_accessor :points
   
   def initialize(ws, name)
     @ws = ws
     @name = name
+    @points = 0
   end
   
   def trigger_event(event)
@@ -51,7 +57,12 @@ end
 class SilenciumServer
   def initialize
     @ws_channel = EM::Channel.new
-    @games = []
+    @cards = [
+      Card.new('car', ['wheels', 'mercedes']),
+      Card.new('github', ['git', 'hub']),
+      Card.new('hell', ['god', 'satan', 'demon']),
+    ]
+    @old_cards = []
     @users = []
   end
   
@@ -90,7 +101,7 @@ class SilenciumServer
     log "Client disconnected: #{sid}"
     
     remove_user ws
-    trigger_event_users
+    user_count_changed :leave
   end
   
   def trigger_event(ws, event)
@@ -124,16 +135,28 @@ class SilenciumServer
         else
           @users << User.new(ws, event.data[:username])
           trigger_event ws, Event.new(:join, accepted: true)
-          trigger_event_users
           trigger_event ws, Event.new(:debug, message: "joined game")
+          user_count_changed :join
         end
       when :guess then
         trigger_global_event Event.new(:guess, {username: find_user(ws).name, word: event.data[:word]})
     end
   end
   
-  def trigger_event_users
+  # called whenever a user joins or leaves
+  # status is :join or :leave
+  def user_count_changed(status = :join)
+    # trigger user event
     trigger_global_event Event.new(:users, users: @users.map { |user| user.name })
+    
+    # check if more than one user is playing
+    if @users.size == 1
+      # only one guy left
+      trigger_global_event Event.new(:pause)
+    elsif @users.size == 2 && status == :join
+      # second user joined, game can continue
+      trigger_global_event Event.new(:unpause)
+    end
   end
   
   private
@@ -163,6 +186,10 @@ class SilenciumServer
   def remove_user(ws)
     user = find_user(ws)
     @users.delete user
+  end
+  
+  def is_giver?(user)
+    user === @users.first
   end
 end
 
