@@ -10,10 +10,12 @@ Multiplayer kick-ass taboo
 ## Using
 
 * em-websocket
+* web-socket-js
 
 ## Set up
 
     bundle install --relock
+    git submodule update --init
 
 ## Run
 
