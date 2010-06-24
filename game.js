@@ -206,6 +206,18 @@ $(document).ready(function() {
 		});
 	});
 	
+	// reset
+	
+	server.bind('reset', function(event) {
+		$('.container').hide();
+		$('.exception').hide();
+		$('#game-container').show();
+		$('.guest').show();
+		
+		clear_errors();
+		$('.chat-box tr').remove();
+	});
+	
 	// time sync
 	
 	server.bind('time_sync', function(event) {

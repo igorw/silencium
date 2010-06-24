@@ -27,6 +27,7 @@ class SilenciumServer
     
     @time_remaining = 60
     @paused = true
+    @game_over = false
     
     EM::PeriodicTimer.new(1) do
       if !@paused
@@ -40,6 +41,20 @@ class SilenciumServer
         trigger_time_sync
       end
     end
+  end
+  
+  def reset
+    @cards = @old_cards
+    @old_cards = []
+    @card = nil
+    
+    @time_remaining = 60
+    @paused = true
+    @game_over = false
+    
+    trigger_global_event Event.new(:reset)
+    
+    @users = []
   end
   
   def init_ws(options)
@@ -248,7 +263,14 @@ class SilenciumServer
   def game_over
     log "Game over"
     
+    if !@game_over
+      EM::Timer.new(10) do
+        reset
+      end
+    end
+    
     @paused = true
+    @game_over = true
     
     scoreboard = @users.sort {|a, b| a.score <=> b.score }.map { |user| {name: user.name, score: user.score} }.reverse
     trigger_global_event Event.new(:game_over, users: scoreboard)
