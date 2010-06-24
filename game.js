@@ -11,9 +11,9 @@ function clear_errors() {
 	$('#error').empty();
 }
 
-function chat_message(username, message, class) {
-	if (!class) {
-		var class = '';
+function chat_message(username, message, class_name) {
+	if (!class_name) {
+		var class_name = '';
 	}
 	
 	var now = new Date();
@@ -22,7 +22,7 @@ function chat_message(username, message, class) {
 			append($('<td>').text(now.getHours() + ':' + now.getMinutes() + ':' + now.getSeconds())).
 			append($('<td>').text(username)).
 			append($('<td>').text(message)
-		).addClass(class)
+		).addClass(class_name)
 	);
 	
 	if ($('.chat-box tr').size() > 8) {
@@ -102,8 +102,8 @@ $(document).ready(function() {
 	});
 	
 	server.bind('guess', function(event) {
-		class = event.correct ? 'correct-guess' : '';
-		chat_message(event.username, event.word, class);
+		class_name = event.correct ? 'correct-guess' : '';
+		chat_message(event.username, event.word, class_name);
 	});
 	
 	// give
