@@ -196,6 +196,7 @@ $(document).ready(function() {
 		$('.exception').hide();
 		$('#game-over').show();
 		
+		$('#scoreboard').empty();
 		$.each(event.users, function(key, user) {
 			var li = $('<li>').text(user.name + ' (' + user.score + ')');
 			if (user.name == username) {
