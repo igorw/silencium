@@ -39,6 +39,7 @@ function chat_message(username, message, class_name) {
 }
 
 $(document).ready(function() {
+	WebSocket.__swfLocation = "web-socket-js/WebSocketMain.swf";
 	var ws = new WebSocket("ws://localhost:3001");
 	var server = new ServerEventDispatcher(ws);
 	
@@ -65,6 +66,7 @@ $(document).ready(function() {
 	// connect
 	
 	server.bind('connect', function(event) {
+		debug('websocket connected')
 	});
 	
 	// close (ws)
