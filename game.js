@@ -1,3 +1,7 @@
+String.prototype.leftPad = function (l, c) {
+	return new Array(l - this.length + 1).join(c || '0') + this;
+}
+
 function debug(message) {
 	$('#debug').append($('<p>').text(message));
 	$('#debug-container').scrollTop($('#debug-container').scrollTop() + 300);
@@ -19,7 +23,11 @@ function chat_message(username, message, class_name) {
 	var now = new Date();
 	$('.chat-box > tbody:last').append(
 		$('<tr>').
-			append($('<td>').text(now.getHours() + ':' + now.getMinutes() + ':' + now.getSeconds())).
+			append($('<td>').text(
+				now.getHours().toString().leftPad(2) + ':' +
+				now.getMinutes().toString().leftPad(2) + ':'+
+				now.getSeconds().toString().leftPad(2)
+			)).
 			append($('<td>').text(username)).
 			append($('<td>').text(message)
 		).addClass(class_name)
