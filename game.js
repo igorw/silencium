@@ -1,6 +1,6 @@
 String.prototype.leftPad = function (l, c) {
 	return new Array(l - this.length + 1).join(c || '0') + this;
-}
+};
 
 function debug(message) {
 	$('#debug').append($('<p>').text(message));
@@ -17,7 +17,7 @@ function clear_errors() {
 
 function chat_message(username, message, class_name) {
 	if (!class_name) {
-		var class_name = '';
+		class_name = '';
 	}
 	
 	var now = new Date();
@@ -38,14 +38,15 @@ function chat_message(username, message, class_name) {
 	}
 }
 
-$(document).ready(function() {
+$(document).ready(function () {
 	WebSocket.__swfLocation = "web-socket-js/WebSocketMain.swf";
-	var ws = new WebSocket("ws://localhost:3001");
-	var server = new ServerEventDispatcher(ws);
 	
-	var username = '';
-	var giver = false;
-	var time_remaining = 0;
+	var ws = new WebSocket("ws://localhost:3001"),
+			server = new ServerEventDispatcher(ws),
+			
+			username = '',
+			giver = false,
+			time_remaining = 0;
 	
 	// init
 	
@@ -55,23 +56,23 @@ $(document).ready(function() {
 	
 	// debug
 	
-	server.bind('alert', function(event) {
+	server.bind('alert', function (event) {
 		alert(event.message);
 	});
 	
-	server.bind('debug', function(event) {
+	server.bind('debug', function (event) {
 		debug(event.message);
 	});
 	
 	// connect
 	
-	server.bind('connect', function(event) {
-		debug('websocket connected')
+	server.bind('connect', function (event) {
+		debug('websocket connected');
 	});
 	
 	// close (ws)
 	
-	server.bind('close', function(event) {
+	server.bind('close', function (event) {
 		$('#game-container').hide();
 		$('.exception').hide();
 		$('#fatal-error').show();
@@ -80,14 +81,14 @@ $(document).ready(function() {
 	
 	// join
 	
-	$('#join-form').submit(function() {
+	$('#join-form').submit(function () {
 		server.trigger('join', {
 			username: $('#join-username').val()
 		});
 		return false;
 	});
 	
-	server.bind('join', function(event) {
+	server.bind('join', function (event) {
 		if (!event.accepted) {
 			error("Could not join: [" + event.message + "]");
 			return;	
@@ -103,7 +104,7 @@ $(document).ready(function() {
 	
 	// guess
 	
-	$('#guess-form').submit(function() {
+	$('#guess-form').submit(function () {
 		server.trigger('guess', {
 			word: $('#guess-word').val()
 		});
@@ -111,14 +112,14 @@ $(document).ready(function() {
 		return false;
 	});
 	
-	server.bind('guess', function(event) {
-		class_name = event.correct ? 'correct-guess' : '';
+	server.bind('guess', function (event) {
+		var class_name = event.correct ? 'correct-guess' : '';
 		chat_message(event.username, event.word, class_name);
 	});
 	
 	// give
 	
-	$('#give-form').submit(function() {
+	$('#give-form').submit(function () {
 		server.trigger('give', {
 			hint: $('#give-hint').val()
 		});
@@ -126,24 +127,24 @@ $(document).ready(function() {
 		return false;
 	});
 	
-	server.bind('give', function(event) {
+	server.bind('give', function (event) {
 		chat_message(event.username, event.hint, 'giver');
 	});
 	
-	server.bind('system_message', function(event) {
+	server.bind('system_message', function (event) {
 		chat_message('', event.message, 'system');
 	});
 	
 	// users
 	
-	server.bind('users', function(event) {
+	server.bind('users', function (event) {
 		$('#users').empty();
-		$.each(event.users, function(key, user) {
+		$.each(event.users, function (key, user) {
 			var li = $('<li>').text(user.name + ' (' + user.score + ')');
 			if (user.giver) {
 				li.addClass('giver');
 			}
-			if (user.name == username) {
+			if (user.name === username) {
 				li.addClass('myself');
 			}
 			$('#users').append(li);
@@ -152,28 +153,28 @@ $(document).ready(function() {
 	
 	// new card
 	
-	server.bind('new_card', function(event) {
+	server.bind('new_card', function (event) {
 		$('#give-word').text(event.word);
 		$('#give-taboo').text(event.taboo_words.join(', '));
 	});
 	
 	// pause
 	
-	server.bind('pause', function(event) {
+	server.bind('pause', function (event) {
 		$('#game-container').hide();
 		$('#pause').show();
 	});
 	
 	// unpause
 	
-	server.bind('unpause', function(event) {
+	server.bind('unpause', function (event) {
 		$('.exception').hide();
 		$('#game-container').show();
 	});
 	
 	// become giver
 	
-	server.bind('become_giver', function(event) {
+	server.bind('become_giver', function (event) {
 		// if we are are already giver
 		// do nothing
 		if (giver) {
@@ -190,7 +191,7 @@ $(document).ready(function() {
 	
 	// become player
 	
-	server.bind('become_player', function(event) {
+	server.bind('become_player', function (event) {
 		giver = false;
 		
 		$('.container').hide();
@@ -201,15 +202,15 @@ $(document).ready(function() {
 	
 	// game over
 	
-	server.bind('game_over', function(event) {
+	server.bind('game_over', function (event) {
 		$('#game-container').hide();
 		$('.exception').hide();
 		$('#game-over').show();
 		
 		$('#scoreboard').empty();
-		$.each(event.users, function(key, user) {
+		$.each(event.users, function (key, user) {
 			var li = $('<li>').text(user.name + ' (' + user.score + ')');
-			if (user.name == username) {
+			if (user.name === username) {
 				li.addClass('myself');
 			}
 			$('#scoreboard').append(li);
@@ -218,7 +219,7 @@ $(document).ready(function() {
 	
 	// reset
 	
-	server.bind('reset', function(event) {
+	server.bind('reset', function (event) {
 		$('.container').hide();
 		$('.exception').hide();
 		$('#game-container').show();
@@ -230,7 +231,7 @@ $(document).ready(function() {
 	
 	// time sync
 	
-	server.bind('time_sync', function(event) {
+	server.bind('time_sync', function (event) {
 		time_remaining = event.time_remaining;
 		$('#time_remaining').text(time_remaining);
 	});
