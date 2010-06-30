@@ -76,7 +76,7 @@ $(document).ready(function () {
 		$('#game-container').hide();
 		$('.exception').hide();
 		$('#fatal-error').show();
-		debug("Error: Websocket closed");
+		debug('Error: Websocket closed');
 	});
 	
 	// join

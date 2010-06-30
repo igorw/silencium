@@ -7,7 +7,7 @@ class Event
     @data = !data.nil? ? data : {}
     
     # symbolize
-    @data = @data.inject({}) { |memo, (k, v)| memo[k.to_sym] = v; memo }
+    @data = recursive_symbolize_keys @data
   end
   
   def to_s
@@ -21,5 +21,26 @@ class Event
   
   def self.export(event)
     [event.name.to_s, event.data].to_json
+  end
+  
+  # def self.import_mq(raw_event)
+  #   parsed_event = Marshal.load(raw_event);
+  #   Event.new(parsed_event[0], parsed_event[1])
+  # end
+  # 
+  # def self.export_mq(event)
+  #   Marshal.dump([event.name, event.data])
+  # end
+  
+  def recursive_symbolize_keys hash
+    if !hash.is_a?(Hash)
+      return hash
+    end
+    
+    new_hash = {}
+    hash.each_pair do |key, value|
+      new_hash[key.to_sym] = recursive_symbolize_keys(value)
+    end
+    new_hash
   end
 end

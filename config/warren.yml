@@ -1,0 +1,7 @@
+development:
+    user: guest
+    pass: guest
+    host: localhost
+    vhost: /
+    logging: false
+    default_queue: silencium

@@ -6,12 +6,18 @@ require 'eventmachine'
 require 'em-websocket'
 require 'json'
 
+require 'warren'
+require 'warren/adapters/amqp_adapter'
+
 require './model/card.rb'
 require './model/event.rb'
 require './model/user.rb'
 
 class SilenciumServer
-  def initialize
+  def initialize(name, port)
+    @name = name
+    @port = port
+    
     @ws_channel = EM::Channel.new
     
     @cards = [
@@ -82,6 +88,17 @@ class SilenciumServer
     end
   end
   
+  def init_mq(queue, options)
+    @mq_queue = queue
+    
+    Warren::Queue.connection = options
+    
+    # contact room server
+    EM::PeriodicTimer.new(5) do
+      trigger_mq_event Event.new(:room_broadcast, {name: @name, port: @port, users: @users.size})
+    end
+  end
+  
   def client_connect(ws, sid)
     log "Client connected: #{sid}"
     
@@ -105,6 +122,10 @@ class SilenciumServer
     end
     
     log "Trigger global event: " + event.to_s
+  end
+  
+  def trigger_mq_event(event)
+    Warren::Queue.publish(@mq_queue, event)
   end
   
   def receive_event(ws, event)
@@ -195,10 +216,6 @@ class SilenciumServer
     trigger_time_sync
   end
   
-  def log(message)
-    puts "[#{Time.new.strftime("%H:%M:%S")}] #{message}"
-  end
-  
   def find_user(ws)
     @users.each do |user|
       if ws === user.ws
@@ -283,9 +300,22 @@ class SilenciumServer
   def trigger_users
     trigger_global_event Event.new(:users, users: @users.map { |user| {name: user.name, giver: is_giver?(user), score: user.score} })
   end
+  
+  def log(message)
+    puts "[#{Time.new.strftime("%H:%M:%S")}] #{message}"
+  end
 end
 
+if ARGV.size < 2
+  puts "Usage: server NAME PORT"
+  exit
+end
+
+name = ARGV[0].to_s
+port = ARGV[1].to_i
+
 EM.run {
-  @server = SilenciumServer.new
-  @server.init_ws host: "0.0.0.0", port: 3001
+  @server = SilenciumServer.new(name, port)
+  @server.init_ws host: "0.0.0.0", port: port
+  @server.init_mq :default, YAML::load("config/warren.yml")
 }
