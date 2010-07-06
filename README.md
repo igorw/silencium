@@ -6,6 +6,7 @@ Multiplayer kick-ass taboo
 
 * Ruby 1.9.2-head
 * Bundler
+* RabbitMQ (or other AMQP server)
 
 ## Using
 
@@ -19,7 +20,10 @@ Multiplayer kick-ass taboo
 
 ## Run
 
-    ruby server.rb
+    sudo rabbitmq-server
+    ruby server.rb "my silencium server" 3001
+    ruby rooms.rb
+    open rooms.html
 
 ## License
 

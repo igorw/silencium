@@ -41,7 +41,9 @@ function chat_message(username, message, class_name) {
 $(document).ready(function () {
 	WebSocket.__swfLocation = "web-socket-js/WebSocketMain.swf";
 	
-	var ws = new WebSocket("ws://localhost:3001"),
+	// fragment is the port
+	var port = location.hash.length ? location.hash.substring(1) : 3000,
+			ws = new WebSocket("ws://localhost:" + port),
 			server = new ServerEventDispatcher(ws),
 			
 			username = '',

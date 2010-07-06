@@ -36,7 +36,7 @@ $(document).ready(function () {
 	server.bind('rooms', function (event) {
 		$('#rooms').empty();
 		$.each(event.rooms, function (key, room) {
-			var li = $('<li>').text(room.name + ' (' + room.users + ')');
+			var li = $('<li>').append($('<a>').attr('href', 'game.html#' + room.port).text(room.name + ' (' + room.users + ')'));
 			$('#rooms').append(li);
 		});
 	});
