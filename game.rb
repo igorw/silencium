@@ -14,19 +14,13 @@ require './model/event.rb'
 require './model/user.rb'
 
 class SilenciumServer
-  def initialize(name, port)
+  def initialize(name, port, cards)
     @name = name
     @port = port
     
     @ws_channel = EM::Channel.new
     
-    @cards = [
-      Card.new('car', ['wheels', 'mercedes']),
-      Card.new('github', ['git', 'hub']),
-      Card.new('hell', ['god', 'satan', 'demon']),
-      Card.new('beer', ['duff', 'drink']),
-      Card.new('phpbb', ['forum', 'bulletin', 'board']),
-    ]
+    @cards = cards
     @old_cards = []
     @users = []
     @card = nil
@@ -306,16 +300,27 @@ class SilenciumServer
   end
 end
 
-if ARGV.size < 2
-  puts "Usage: server NAME PORT"
+if ARGV.size < 3
+  puts "Usage: server NAME PORT CARDS_FILE"
+  puts "CARDS_FILE is a json file"
   exit
 end
 
 name = ARGV[0].to_s
 port = ARGV[1].to_i
+cards_file = ARGV[2].to_s
+
+cards = []
+
+all_cards = JSON.parse(File.read(cards_file)).sort_by { rand }
+(1..50).each do
+  raw_card = all_cards.shift
+  cards << Card.new(raw_card[0], raw_card[1])
+end
+all_cards = nil
 
 EM.run {
-  @server = SilenciumServer.new(name, port)
+  @server = SilenciumServer.new(name, port, cards)
   @server.init_ws host: "0.0.0.0", port: port
   @server.init_mq :default, YAML::load("config/warren.yml")
 }

@@ -21,9 +21,18 @@ Multiplayer kick-ass taboo
 ## Run
 
     sudo rabbitmq-server
-    ruby server.rb "my silencium server" 3001
+    ruby server.rb "my silencium server" 3001 cards.js
     ruby rooms.rb
     open rooms.html
+
+## Cards format
+
+Cards are stored in a JSON file in following format:
+
+    [
+        [word1, [taboo_word1, taboo_word2, taboo_word_n]],
+        [word2, [taboo_word1, taboo_word2, taboo_word_n]]
+    ]
 
 ## License
 
