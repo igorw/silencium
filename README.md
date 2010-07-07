@@ -4,14 +4,18 @@ Multiplayer kick-ass taboo
 
 ## Requirements
 
-* Ruby 1.9.2-head
+* Ruby 1.9
 * Bundler
 * RabbitMQ (or other AMQP server)
 
 ## Using
 
+* eventmachine
 * em-websocket
 * web-socket-js
+* warren
+* google font api
+* jQuery
 
 ## Set up
 
