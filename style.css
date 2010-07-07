@@ -4,7 +4,6 @@
 	right: 0px;
 	width: 250px;
 	height: 300px;
-	background: #ededed;
 	padding: 15px;
 	overflow-y: auto;
 }
@@ -51,4 +50,124 @@
 
 #scoreboard li.myself {
 	font-weight: bold;
+}
+
+/*            general styling           */
+
+html body {
+	background: #FEF9EA;
+	font-family: georgia, serif;
+	color: #29262B;
+}
+
+.wrapper {
+	padding: 10px;
+	width: 760px;
+	margin: 0 auto;
+}
+
+h1 {
+	font-family: 'Tangerine', serif;
+	font-size: 60px;
+	color: #ACCC19;
+	
+	margin-top: 0px;
+	margin-bottom: 5px;
+}
+
+input {  
+	padding: 9px;  
+	border: solid 1px #E5E5E5;  
+	outline: 0;  
+	font: normal 13px/100% Verdana, Tahoma, sans-serif;  
+	width: 200px;  
+	background: #FFFFFF url('bg_form.png') left top repeat-x;  
+	background: -webkit-gradient(linear, left top, left 25, from(#FFFFFF), color-stop(4%, #EEEEEE), to(#FFFFFF));  
+	background: -moz-linear-gradient(top, #FFFFFF, #EEEEEE 1px, #FFFFFF 25px);  
+	box-shadow: rgba(0,0,0, 0.1) 0px 0px 8px;  
+	-moz-box-shadow: rgba(0,0,0, 0.1) 0px 0px 8px;  
+	-webkit-box-shadow: rgba(0,0,0, 0.1) 0px 0px 8px;  
+}
+
+input:hover, textarea:hover, input:focus, textarea:focus {  
+	border-color: #C9C9C9;  
+	box-shadow: rgba(0,0,0, 0.15) 0px 0px 8px;  
+	-moz-box-shadow: rgba(0,0,0, 0.15) 0px 0px 8px;  
+	-webkit-box-shadow: rgba(0, 0, 0, 0.15) 0px 0px 8px;  
+}
+
+input[type=submit] {
+	width: auto;  
+	padding: 9px 15px;  
+	background: #617798;  
+	border: 0;  
+	font-size: 14px;  
+	color: #FFFFFF;  
+	-moz-border-radius: 5px;  
+	-webkit-border-radius: 5px;  
+}
+
+#debug-button-container {
+	position: absolute;
+	top: 0px;
+	right: 0px;
+	padding: 15px;
+}
+
+.debug-box {
+	background: #ACCC19;
+	-moz-border-radius-bottomleft: 10px;
+	-webkit-border-bottom-left-radius: 10px;
+}
+
+.debug-box a {
+	color: white;
+	text-decoration: none;
+}
+
+.debug-box a:hover {
+	text-decoration: underline;
+}
+
+.debug-box h2 {
+	margin-top: 0px;
+	margin-bottom: 5px;
+}
+
+#debug-close-button {
+	position: absolute;
+	bottom: 10px;
+}
+
+ul#give-card {
+	list-style: none;
+	padding: 10px;
+	float: left;
+	background: lightblue;
+	-moz-border-radius: 10px;
+	-webkit-border-radius: 10px;
+}
+
+ul#give-card li {
+}
+
+ul#give-card li.word {
+	font-weight: bold;
+}
+
+#users-container {
+}
+
+#time-container {
+	float: right;
+	width: 100px;
+	margin-right: 50px;
+}
+
+.chat-box {
+	margin-bottom: 15px;
+}
+
+.clear {
+	clear: both;
 }

@@ -56,6 +56,18 @@ $(document).ready(function () {
 	$('.exception').hide();
 	$('.guest').show();
 	
+	$('#debug-container').hide();
+	$('#debug-button').click(function () {
+		$('#debug-button-container').hide();
+		$('#debug-container').show();
+		return false;
+	});
+	$('#debug-close-button').click(function () {
+		$('#debug-container').hide();
+		$('#debug-button-container').show();
+		return false;
+	});
+	
 	// debug
 	
 	server.bind('alert', function (event) {
@@ -156,8 +168,11 @@ $(document).ready(function () {
 	// new card
 	
 	server.bind('new_card', function (event) {
-		$('#give-word').text(event.word);
-		$('#give-taboo').text(event.taboo_words.join(', '));
+		$('#give-card').empty();
+		$('#give-card').append($('<li class="word">').text(event.word));
+		$.each(event.taboo_words, function (key, taboo_word) {
+			$('#give-card').append($('<li class="taboo-word">').text(taboo_word));
+		});
 	});
 	
 	// pause

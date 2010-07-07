@@ -9,6 +9,20 @@ $(document).ready(function () {
 	var ws = new WebSocket("ws://localhost:4001"),
 			server = new ServerEventDispatcher(ws);
 	
+	// init
+	
+	$('#debug-container').hide();
+	$('#debug-button').click(function () {
+		$('#debug-button-container').hide();
+		$('#debug-container').show();
+		return false;
+	});
+	$('#debug-close-button').click(function () {
+		$('#debug-container').hide();
+		$('#debug-button-container').show();
+		return false;
+	});
+	
 	// debug
 	
 	server.bind('alert', function (event) {
