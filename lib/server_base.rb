@@ -21,7 +21,11 @@ module Silencium
             event = Event.import(raw_event)
             receive_event ws, event
           }
-        
+          
+          ws.onerror { |e|
+            raise e
+          }
+          
           client_connect ws, sid
         }
       end
