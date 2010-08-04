@@ -29,7 +29,7 @@ cards_file = ARGV[2].to_s
 cards = []
 
 all_cards = JSON.parse(File.read(cards_file)).sort_by { rand }
-(1..50).each do
+(1..([all_cards.size, 50]).min).each do
   raw_card = all_cards.shift
   cards << Card.new(raw_card[0], raw_card[1])
 end
