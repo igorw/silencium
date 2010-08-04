@@ -25,7 +25,7 @@ Multiplayer kick-ass taboo
 ## Run
 
     sudo rabbitmq-server
-    ruby game.rb "my silencium server" 3001 cards.js
+    ruby game.rb "my silencium server" 3001 cards.json
     ruby rooms.rb
     open rooms.html
 
